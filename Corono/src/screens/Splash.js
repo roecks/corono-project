@@ -118,7 +118,7 @@ class Splash extends React.Component {
 					<TouchableOpacity onPress={() => { this._createAccount(); }}>
 						<View style={[ buttons.btn ]}>
 							<Text style={[ buttons.btnText ]}>
-								Maak account aan
+								Ik doe mee
 							</Text>
 						</View>
 					</TouchableOpacity>

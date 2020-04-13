@@ -2,7 +2,7 @@
 ![Corono App](Design/Corono-Overview.png)
 
 # Corono
-an open source initiative to build a privacy first mobile app which tracks Corona infections and digitizes contact research. This repository includes app development in React-Native. For other related projects in the build of Corono please see links on the bottom of this Readme.
+an open source initiative to build a privacy first mobile app which tracks Corona symptoms and digitizes a form of contact research. This repository includes app development in React-Native. For other related projects in the build of Corono please see links on the bottom of document.
 
 ## Privacy
 The big challenge in Europe to launch such an application is privacy. How do we manage privacy in sharing ones medical information without breaching ones right for privacy.
