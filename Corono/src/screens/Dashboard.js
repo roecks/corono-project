@@ -20,9 +20,12 @@ TextInput,
 } from 'react-native';
 
 import { Navigation } from 'react-navigation';
+import Modal from 'react-native-modal';
 
 import Svg, { Rect, RadialGradient, LinearGradient, Stop, Path, Circle, Text as SVGText } from 'react-native-svg';
 import AsyncStorage from '@react-native-community/async-storage';
+
+import Notifications from './Notifications';
 
 // import styles
 import { viewport, font, buttons, nav, stats } from '../stylesheets/master';
@@ -38,6 +41,9 @@ class Dashboard extends React.Component {
 		togglePos: new Animated.Value(0),
 		toggleColor: new Animated.Value(0),
 		syncAlpha: new Animated.Value(1),
+		isModalVisible: false,
+		scale: new Animated.Value(1),
+		headerRadius: new Animated.Value(0),
 		publickey: ''
 	}
 
@@ -92,6 +98,30 @@ class Dashboard extends React.Component {
 		this.props.navigation.navigate('Splash');
 	}
 
+	_showModal() {
+
+		let toScale = (this.state.isModalVisible) ? 1 : .95;
+		let toRadius = (this.state.isModalVisible) ? 0 : 1;
+
+		Animated.parallel([
+			Animated.timing(this.state.scale, {
+				toValue: toScale,
+				duration: 400,
+				easing: Easing.out(Easing.cubic),
+				useNativeDriver: true
+			}),
+			Animated.timing(this.state.headerRadius, {
+				toValue: toRadius,
+				duration: 1000,
+				easing: Easing.out(Easing.cubic),
+				useNativeDriver: true
+			}),
+		]).start();
+
+		this.setState({isModalVisible: !this.state.isModalVisible});
+
+	}
+
 	render() {
 
 		const interpolateColor = this.state.toggleColor.interpolate({
@@ -99,11 +129,31 @@ class Dashboard extends React.Component {
 			outputRange: ['#EEEEEE', '#2A333E']
 		})
 
+		const interpolateRadius = this.state.headerRadius.interpolate({
+			inputRange: [0, 1],
+			outputRange: [0, 30]
+		})
+
 		return (
 
 			<View style={[ viewport.container ]}>
 
-				<View style={{ position: 'relative', flex: 2, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center' }}>
+				<TouchableOpacity style={[ nav.notificationIcon ]} onPress={() => { this._showModal() }}>
+					<Text style={[ font.regular, font.white, { fontWeight: 'bold' }]}>3</Text>
+				</TouchableOpacity>
+				<Modal 
+					isVisible={ this.state.isModalVisible }
+					hasBackdrop={ false }
+					style={[ viewport.modal ]}
+					coverScreen={ false }
+					useNativeDriver={ true }
+					>
+					<View style={{ flex: 1, backgroundColor: '#F9F9F9', borderRadius: 30 }}>
+						<Notifications />
+					</View>
+				</Modal>
+
+				<Animated.View style={[ (this.state.isModalVisible) ? viewport.scale : null, viewport.header, { transform: [{ scale: this.state.scale }], borderRadius: interpolateRadius }]}>
 					
 					<View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
 						<Svg width="100%" height="100%" viewBox="0 0 100 100">
@@ -118,21 +168,17 @@ class Dashboard extends React.Component {
 						</Svg>
 					</View>
 
-					<View style={{ padding: 0, flex: 1, alignItems: 'center', flexDirection: 'row' }}>
-						<View style={[ stats.clmn, { alignItems: 'flex-end', borderRightWidth: 1, borderColor: 'rgba(255, 255, 255, .2)', paddingBottom: 100 }]}>
-							<Text style={ font.statTitle }>34%</Text>
+					<View style={{ padding: 0, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+						<View style={[ stats.clmn ]}>
 							<Text style={ font.statSub }>encounter score</Text>
+							<Text style={ font.statTitle }>34</Text>
 						</View>
-						<View style={[ stats.clmn, { marginTop: 0 }]}>
-							<Text style={ font.statSub }>high risk encounters</Text>
-							<Text style={ font.statTitleSmall }>5%</Text>
-							<TouchableOpacity style={{ marginTop: 15 }} onPress={() => { this.props.navigation.navigate('Stats') }}>
-								<Image style={ buttons.icon } source={{uri: 'https://corono.s3-eu-west-1.amazonaws.com/icons/Stats.png'}} />
-							</TouchableOpacity>
-						</View>
+						<TouchableOpacity style={{ marginTop: 15, padding: 30 }} onPress={() => { this.props.navigation.navigate('Stats') }}>
+							<Image style={ buttons.icon } source={{uri: 'https://corono.s3-eu-west-1.amazonaws.com/icons/Stats.png'}} />
+						</TouchableOpacity>
 					</View>
 
-				</View>
+				</Animated.View>
 
 				<View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 40 }}>
 					

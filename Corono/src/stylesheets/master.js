@@ -11,18 +11,44 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const viewport = StyleSheet.create({
   container: {
-  	position: 'relative',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'stretch',
-    // backgroundColor: '#D5FF44'
-    backgroundColor: '#FFF'
-  }
+	  	position: 'relative',
+	    flex: 1,
+	    justifyContent: 'center',
+	    alignItems: 'stretch',
+	    // backgroundColor: '#D5FF44'
+	    backgroundColor: '#FFF'
+  },
+  header: {
+	  	position: 'relative', 
+	  	flex: 2, 
+	  	backgroundColor: '#FFF', 
+	  	justifyContent: 'center', 
+	  	alignItems: 'center'
+  },
+  scale: {
+  		overflow: 'hidden'
+  },
+  modal: {
+		position: 'relative', 
+		margin: 0, 
+		marginTop: 110, 
+		zIndex: 1000,
+		
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0 },
+		shadowOpacity: 0.2,
+		shadowRadius: 30,
+	}
 });
 
 const font = StyleSheet.create({
 	heading: {
 		fontSize: 56,
+		color: '#000000',
+		fontWeight: 'bold'
+	},
+	subheading: {
+		fontSize: 16,
 		color: '#000000',
 		fontWeight: 'bold'
 	},
@@ -47,7 +73,7 @@ const font = StyleSheet.create({
 	},
 
 	statTitle: {
-		fontSize: 60,
+		fontSize: 100,
 		fontWeight: 'bold',
 		color: '#FFF'
 	},
@@ -95,7 +121,7 @@ const buttons = StyleSheet.create({
 	},
 	wide: {
 		position: 'relative',
-		top: 0,
+		top: -1,
 		width: 25,
 	},
 
@@ -111,23 +137,44 @@ const buttons = StyleSheet.create({
 	},
 	toggle: {
 		position: 'absolute',
-		top: -2, left: -2,
-		width: 40, height: 40,
+		top: -1, left: -1,
+		width: 38, height: 38,
 		borderRadius: 20,
 		backgroundColor: '#FFF',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 0 },
-		shadowOpacity: 0.5,
+		shadowOpacity: 0.2,
 		shadowRadius: 30,
 	}
 });
 
 const nav = StyleSheet.create({
+	notificationIcon: {
+		position: 'absolute', 
+		top: 50, 
+		right: 30, 
+		width: 40, 
+		height: 40, 
+		backgroundColor: '#FF8E41', 
+		zIndex: 1001, 
+		borderRadius: 10,
+		borderBottomLeftRadius: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0 },
+		shadowOpacity: 0.2,
+		shadowRadius: 30,
+	},
 	bar: {
 		position: 'absolute',
-		bottom: 60,
-		width: '15%', height: 50,
+		bottom: 30,
+		width: '15%', 
+		height: 50,
 		backgroundColor: '#FFF',
+		borderRadius: 10,
+
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 0 },
 		shadowOpacity: 0.25,
@@ -136,14 +183,12 @@ const nav = StyleSheet.create({
 		zIndex: 100,
 	},
 	barRight: {
-		right: 0,
-		borderTopLeftRadius: 10,
-		borderBottomLeftRadius: 10,
+		right: 30,
+		borderTopLeftRadius: 0,
 	},
 	barLeft: {
-		left: 0,
-		borderTopRightRadius: 10,
-		borderBottomRightRadius: 10,
+		left: 30,
+		borderTopRightRadius: 0
 	},
 	inner: {
 		flex: 1,
@@ -159,7 +204,8 @@ const nav = StyleSheet.create({
 const stats = StyleSheet.create({
 	clmn: {
 		padding: 20,
-		width: '50%',
+		width: '70%',
+		alignItems: 'center'
 	},
 	toggles: {
 		width: 210,
@@ -266,4 +312,54 @@ const maps = StyleSheet.create({
 	}
 });
 
-export { viewport, font, buttons, nav, stats, sliders, maps }
+const notifications = StyleSheet.create({
+	container: {
+		width: '100%',
+		height: '100%',
+		padding: 20,
+		backgroundColor: '#F9F9F9',
+		borderRadius: 20
+	},
+	notification: {
+		width: '100%',
+		flexDirection: 'row',
+		paddingTop: 20,
+		paddingBottom: 20,
+		marginBottom: 10,
+		borderRadius: 10,
+		backgroundColor: 'white',
+	},
+	unfold: {		
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 0 },
+		shadowOpacity: 0.1,
+		shadowRadius: 15,
+	},
+	label: {
+		width: '14%',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	dot: {
+		width: 10,
+		height: 10,
+		borderRadius: 5,
+		backgroundColor: 'orange'
+	},
+	read: {
+		backgroundColor: '#EEE'
+	},
+	stretch: {
+		height: 50,
+		backgroundColor: '#EEE'
+	},
+	message: {
+		lineHeight: 16
+	},
+	detailed: {
+		marginTop: 10,
+		width: '90%'
+	}
+});
+
+export { viewport, font, buttons, nav, stats, sliders, maps, notifications }

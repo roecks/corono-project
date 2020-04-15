@@ -385,7 +385,7 @@ class Stats extends React.Component {
 
 			<View style={[ viewport.container ]}>
 
-				<View style={{ position: 'relative', flex: 2, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'flex-start' }}>
+				<View style={{ position: 'relative', flex: 2, backgroundColor: '#FFF', justifyContent: 'center', alignItems: 'center' }}>
 					
 					<View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
 						<Svg width={ 414 } height={ 600 } viewBox="0 0 414 600">
@@ -407,26 +407,32 @@ class Stats extends React.Component {
 							<Rect x="82" y={ this.state.points[4] } width="1" height="80" fill="url(#line)" />
 
 							<Polygon id="Rectangle" points={ this.state.anchors } fill="url(#grad)"></Polygon>
-							<Circle cx="414" cy={ this.state.points[0] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
+							
 							<Circle cx="331.2" cy={ this.state.points[1] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
 							<Circle cx="248.4" cy={ this.state.points[2] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
 							<Circle cx="165.6" cy={ this.state.points[3] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
 							<Circle cx="82.8" cy={ this.state.points[4] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
-							<Circle cx="0" cy={ this.state.points[5] } r="7" fill="white" fillOpacity="1" stroke="#FF6500" strokeWidth="2" />
+							
 
 						</Svg>
 					</View>
 
-					<View style={{ padding: 0, paddingLeft: 30, flex: 1, alignItems: 'flex-start', justifyContent: 'center' }}>
+					<View style={{ padding: 0, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 
-						<View style={[ stats.clmn, { width: '100%', alignItems: 'flex-start', paddingTop: 50 }]}>
-							<Text style={ font.statSub }>encounter score</Text>
-							<Text style={[ font.statTitle, { fontSize: 72 } ]}>34%</Text>
+            {/*
+						<View style={[ stats.clmn, { padding: 0 } ]}>
+              <View style={{ borderBottomWidth: 1, borderBottomColor: '#FFF' }}>
+                <Text style={[ font.statSub ]}>encounter score</Text>
+              </View>
+							<Text style={[ font.statTitle, { top: -10 }]}>34</Text>
 						</View>
-						<View style={[ stats.clmn, { width: '100%', marginTop: 0, paddingTop: 0 }]}>
-							<Text style={ font.statSub }>high risk encounters</Text>
-							<Text style={ font.statTitleSmall }>5%</Text>
+						<View style={[ stats.clmn, { padding: 0 }]}>
+              <View style={{ borderBottomWidth: 1, borderBottomColor: '#FFF' }}>
+							   <Text style={[ font.statSub ]}>riskyness</Text>
+              </View>
+              <Text style={ font.statTitleSmall }>5%</Text>
 						</View>
+            */}
 
 					</View>
 
