@@ -17,6 +17,7 @@ import {
   View,
   ScrollView,
   Text,
+  Number
 } from 'react-native';
 
 import { Navigation } from 'react-navigation';
@@ -24,6 +25,10 @@ import Modal from 'react-native-modal';
 
 import Svg, { G, Rect, RadialGradient, LinearGradient, Stop, Path, Circle, Text as SVGText } from 'react-native-svg';
 import AsyncStorage from '@react-native-community/async-storage';
+
+// import geo data
+import Geolocation from '@react-native-community/geolocation';
+import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
 
 import { Surface, Group, Shape, ART } from '@react-native-community/art';
 import * as d3 from 'd3';
@@ -66,7 +71,6 @@ import { viewport, font, buttons, nav, stats } from '../stylesheets/master';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-
 class Dashboard extends React.Component {
 
 	state = {
@@ -77,11 +81,126 @@ class Dashboard extends React.Component {
 		isModalVisible: false,
 		scale: new Animated.Value(1),
 		headerRadius: new Animated.Value(0),
-		publickey: ''
+		publickey: '',
+		locations: [],
+		writing: false,
+		watchID: null,
+
+		prevLatLng: null,
+		distanceTraveled: 0,
 	}
 
+	watchID = null;
+
 	componentDidMount() {
+
 		this._setPublickey();
+		this._startGeo();
+
+		setInterval(() => {
+			// this._showLocs();
+		}, 2000);
+
+	}
+
+	_startGeo = async () => {
+
+		let watchID = await Geolocation.watchPosition(
+			(info) => {
+
+				const lat = info.coords.latitude;
+				const long = info.coords.longitude;
+				const loc = { latitude: lat, longitude: long };
+				this._saveLocs(loc);
+
+				// const joined = this.state.locations.concat(loc);
+				// this.setState({ locations: joined });
+				// console.log(this.state.locations);
+
+			},
+			(error) => console.log(error),
+			{
+				enableHighAccuracy: true,
+				distanceFilter: 0
+			}
+		);
+
+		await this.setState({ watchID: watchID });
+		console.log('watchID: '+ this.state.watchID);
+
+
+	}
+
+	// set a writing var to manage payload on savelocs function
+	writing = false;
+
+	_saveLocs = async (loc) => {
+
+		if(!this.writing) {
+
+			this.writing = true;
+			var locations = await AsyncStorage.getItem('locations');
+
+			if(locations === null) {
+
+				try {
+					const newLocs = [];
+					await this.setState({ prevLatLng: loc });
+					await AsyncStorage.setItem('locations', JSON.stringify(newLocs));
+				} catch(e) { console.log(e) }
+				
+			} else {
+
+				locations = JSON.parse(locations);
+				locations.push(loc);
+
+				// calculate distance
+				const prevLatLng = this.state.prevLatLng;
+				const distance = this._calcDistance(this.state.prevLatLng.latitude, loc.latitude, this.state.prevLatLng.longitude, loc.longitude, 'K');
+				var stateDist = (!this.state.distanceTraveled) ? distance : this.state.distanceTraveled + distance;
+				await this.setState({ distanceTraveled: stateDist });
+
+				// set new loc as prevLatLng
+				await this.setState({ prevLatLng: loc });
+
+				try {
+					await AsyncStorage.setItem('locations', JSON.stringify(locations));
+				} catch(e) { console.log(e) }
+
+			}
+			
+			this.writing = false;
+		}
+
+	}
+
+	_showLocs = async () => {
+
+		let locations = await AsyncStorage.getItem('locations');
+		console.log(locations);
+
+	}
+
+	_calcDistance = (lat1, lat2, lon1, lon2, unit) => {
+		if ((lat1 == lat2) && (lon1 == lon2)) {
+			return 0;
+		}
+		else {
+			var radlat1 = Math.PI * lat1/180;
+			var radlat2 = Math.PI * lat2/180;
+			var theta = lon1-lon2;
+			var radtheta = Math.PI * theta/180;
+			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			if (dist > 1) {
+				dist = 1;
+			}
+			dist = Math.acos(dist);
+			dist = dist * 180/Math.PI;
+			dist = dist * 60 * 1.1515;
+			if (unit=="K") { dist = dist * 1.609344 }
+			if (unit=="N") { dist = dist * 0.8684 }
+			return dist;
+		}
 	}
 
 	_setPublickey = async () => {
@@ -91,9 +210,7 @@ class Dashboard extends React.Component {
 			await this.setState({ publickey: publickey });
 			console.log(this.state.publickey);
 
-		} catch (e) {
-			console.log(e);
-		}
+		} catch (e) { console.log(e); }
 	}
 
 	_toggle = () => {
@@ -127,6 +244,8 @@ class Dashboard extends React.Component {
 	}
 
 	_clearUI = async () => {
+		// Geolocation.clearWatch(this.state.watchID);
+		Geolocation.stopObserving();
 		await AsyncStorage.clear();
 		this.props.navigation.navigate('Splash');
 	}
@@ -240,7 +359,7 @@ class Dashboard extends React.Component {
 					<View style={{ padding: 0, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 						<View style={[ stats.clmn, { paddingTop: 30} ]}>
 							<Text style={ font.statSub }>total kms today</Text>
-							<Text style={[ font.statTitle ]}>34.265</Text>
+							<Text style={[ font.statTitle ]}>{ this.state.distanceTraveled.toFixed(2) }</Text>
 							<Text style={ font.statSub }>89.458 kms yesterday</Text>
 						</View>
 					</View>

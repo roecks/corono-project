@@ -58,22 +58,6 @@ class Stats extends React.Component {
 		}
 	}
 
-	_handleToggle = async (period) => {
-
-		// alert(period);
-		this.setState({ activeToggle: period });
-
-		let points;
-		if(period === 'hours') points = [500, 325, 430, 470, 400, 448];
-		else if(period === 'days') points = [520, 430, 460, 380, 350, 400];
-		else if(period === 'weeks') points = [500, 325, 430, 470, 400, 448];
-		await this.setState({ points: points });
-
-		let anchors = "0 0 414 0 414 "+ this.state.points[0] +" 331.2 "+ this.state.points[1] +" 248.4 "+ this.state.points[2] +" 165.6 "+ this.state.points[3] +" 82.8 "+ this.state.points[4] +" 0 "+ this.state.points[5];
-		this.setState({ anchors: anchors });
-
-	}
-
 	_openMaps = () => {
 		this.setState({ map: true });
 		Animated.timing(this.state.mapAlpha, {
@@ -140,8 +124,8 @@ class Stats extends React.Component {
           */}
 
 
-          <Text style={[ styles.heading ]}>dit is het verloop van jouw risicoscore</Text>
-					<Text style={[ font.caption, { width: '80%', textAlign: 'center', marginTop: 30 } ]}>Jouw risicoscore wordt berekend op basis van jouw anonieme bewegingen van de afgelopen 6 dagen afgezet tegen de bewegingen van de gemeenschap en de symptomen.</Text>
+          <Text style={[ styles.heading ]}>jouw risicoscore in contact met de omgeving</Text>
+					<Text style={[ font.caption, { width: '80%', textAlign: 'center', marginTop: 30 } ]}>Jouw risicoscore wordt berekend op basis van jouw anonieme bewegingen van de afgelopen 6 dagen in contact met de omgeving.</Text>
 
 					<TouchableOpacity onPress={() => { this._openMaps() }}>
 						<View style={{ width: 40, height: 40, marginTop: 30 }}>

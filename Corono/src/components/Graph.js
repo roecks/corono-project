@@ -53,7 +53,7 @@ const cursorRadius = 10;
 const labelWidth = 70;
 
 const valueOne = new Animated.Value(20);
-const values = [20, 45, 65, 10, 45, 30];
+const values = [20, 35, 65, 10, 45, 30];
 const data = [
 	{ x: new Date(2020, 9, 1), y: values[0] },
 	{ x: new Date(2020, 9, 2), y: values[1] },
@@ -65,12 +65,12 @@ const data = [
 
 const scaleX = scaleTime().domain([new Date(2020, 9, 1), new Date(2020, 9, 6)]).range([0, SCREEN_WIDTH]);
 const scaleY = scaleLinear().domain([0, 100]).range([height - verticalPadding, verticalPadding]);
-const scaleLabel = scaleQuantile().domain([0, 300]).range(values);
+const scaleLabel = scaleQuantile().domain([0, 100]).range(values);
 
 const line = d3.shape.line()
 	.x(d => scaleX(d.x))
 	.y(d => scaleY(d.y))
-	.curve(d3.shape.curveBasis)(data);
+	.curve(d3.shape.curveNatural)(data);
 
 const properties = path.svgPathProperties(line);
 const lineLength = properties.getTotalLength();
@@ -91,7 +91,7 @@ class Graph extends React.Component {
 	moveCursor = (value) => {
 		const {x, y} = properties.getPointAtLength(value);
 		this.cursor.current.setNativeProps({ top: y - cursorRadius, left: x - cursorRadius });
-		const label = scaleLabel(scaleY.invert(y));
+		const label = scaleY.invert(y).toFixed(0);
 		this.label.current.setNativeProps({ text: `${label}` });
 	}
 
@@ -102,7 +102,7 @@ class Graph extends React.Component {
 
 		InteractionManager.runAfterInteractions(() => {
 			setTimeout(() => {
-				this.scrollview.current.scrollToEnd({ animated: false });
+				this.scrollview.current.scrollTo({ x: SCREEN_WIDTH * 1.1, animated: false });
 				Animated.timing(this.state.alpha, {
 					toValue: 1,
 					duration: 500,

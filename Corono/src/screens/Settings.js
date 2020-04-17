@@ -37,12 +37,52 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 class Settings extends React.Component {
 
 	state = {
-		publickey: ''
+		publickey: '',
 	}
 
 	componentDidMount() {
+
 		this._setPublickey();
+		this._initSymptoms();
+		this._showSymptoms();
+
 	}
+
+	_initSymptoms = async () => {
+
+		let init = [];
+
+		const symptoms = {
+			headache: 0,
+			cold: 0,
+			stuffy: 0,
+			nauseous: 10,
+			fever: 0,
+			diarrhea: 0
+		}
+
+		let value = await AsyncStorage.getItem('symptoms');
+		if (value === null) {
+			try {
+				await AsyncStorage.setItem('symptoms', JSON.stringify(symptoms));
+			} catch(e) {
+				console.log(e);
+			}
+		}
+		
+
+	}
+
+	_updateSymptoms = () => {
+
+	}
+
+	_showSymptoms = async () => {
+		let symptoms = await AsyncStorage.getItem('symptoms');
+		symptoms = JSON.parse(symptoms);
+		console.log(symptoms);
+	}
+
 
 	_setPublickey = async () => {
 		try {
@@ -96,12 +136,12 @@ class Settings extends React.Component {
 
 				<View style={{ flex: 4, justifyContent: 'flex-start', alignItems: 'stretch', padding: 50, paddingTop: 30 }}>
 					
-					<DraggableToggle title='hoofdpijnen' />
-					<DraggableToggle title='verkouden' />
-					<DraggableToggle title='benauwd' />
-					<DraggableToggle title='misselijk' />
-					<DraggableToggle title='koorts' />
-					<DraggableToggle title='diarree' />
+					<DraggableToggle item="headache" title='hoofdpijnen' />
+					<DraggableToggle item="cold" title='verkouden' />
+					<DraggableToggle item="stuffy" title='benauwd' />
+					<DraggableToggle item="nauseous" title='misselijk' />
+					<DraggableToggle item="fever" title='koorts' />
+					<DraggableToggle item="diarrhea" title='diarree' />
 
 				</View>
 

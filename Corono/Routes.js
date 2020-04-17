@@ -17,7 +17,7 @@ const Project = createStackNavigator(
 		Notifications: { screen: Notifications },
 	},
 	{
-		initialRouteName: 'Dashboard',
+		initialRouteName: 'Splash',
 		headerMode: 'none'
 	}
 )
