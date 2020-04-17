@@ -6,7 +6,7 @@
 
 import React, {Component} from 'react';
 import {
-TextInput,
+  TextInput,
   Easing,
   Animated,
   InteractionManager,
@@ -22,8 +22,40 @@ TextInput,
 import { Navigation } from 'react-navigation';
 import Modal from 'react-native-modal';
 
-import Svg, { Rect, RadialGradient, LinearGradient, Stop, Path, Circle, Text as SVGText } from 'react-native-svg';
+import Svg, { G, Rect, RadialGradient, LinearGradient, Stop, Path, Circle, Text as SVGText } from 'react-native-svg';
 import AsyncStorage from '@react-native-community/async-storage';
+
+import { Surface, Group, Shape, ART } from '@react-native-community/art';
+import * as d3 from 'd3';
+
+const today = [
+  { name: 'actual', kms: 34 },
+  { name: 'over', kms: 66 },
+]
+
+const yesterday = [
+  { name: 'actual', kms: 89 },
+  { name: 'over', kms: 11 },
+]
+
+const todaySizes = [200, 140];
+const yesterdaySizes = [200, 120];
+
+const todayAngles = d3.pie().value(d => d.kms)(today);
+const yesterdayAngles = d3.pie().value(d => d.kms)(yesterday);
+
+const todayPath = d3.arc()
+  .outerRadius(todaySizes[1])
+  .innerRadius(todaySizes[1] - 8)
+  .padAngle(.03);
+
+const yesterdayPath = d3.arc()
+  .outerRadius(yesterdaySizes[1])
+  .innerRadius(yesterdaySizes[1] - 4)
+  .padAngle(.03);
+
+const colorsToday = ['rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)'];
+const colorsYesterday = ['rgba(0, 0, 0, .2)', 'rgba(0, 0, 0, 0)'];
 
 import Notifications from './Notifications';
 
@@ -33,6 +65,7 @@ import { viewport, font, buttons, nav, stats } from '../stylesheets/master';
 // set dimensions
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 
 class Dashboard extends React.Component {
 
@@ -156,6 +189,8 @@ class Dashboard extends React.Component {
 				<Animated.View style={[ (this.state.isModalVisible) ? viewport.scale : null, viewport.header, { transform: [{ scale: this.state.scale }], borderRadius: interpolateRadius }]}>
 					
 					<View style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+
+
 						<Svg width="100%" height="100%" viewBox="0 0 100 100">
 
 							<RadialGradient id="grad" x1="0%" y1="30%" x2="0%" y2="100%">
@@ -165,22 +200,58 @@ class Dashboard extends React.Component {
 							</RadialGradient>
 
 							<Circle cx="50" cy="10" r="100" fill="url(#grad)" />
+
 						</Svg>
+
+						<Surface width={ SCREEN_WIDTH } height={ SCREEN_WIDTH } style={{ position: 'absolute', top: '3%', left: 0, transform: [{ rotate: '180deg' }] }}>
+					        
+					        <Group x={ todaySizes[1] + (SCREEN_WIDTH - todaySizes[1] * 2) / 2 } y={ todaySizes[1] }>
+					          {
+							      todayAngles.map(section => (
+							        <Shape
+							          key={ section.index }
+							          d={ todayPath(section) }
+							          fill={ '#FFF' }
+							          strokeWidth={ 0 }
+							          fill={ colorsToday[section.index] }
+							        />
+							      ))
+							    }  
+					        </Group>
+
+					        <Group x={ yesterdaySizes[1] + (SCREEN_WIDTH - yesterdaySizes[1] * 2) / 2 } y={ yesterdaySizes[1] + 20 }>
+					          {
+							      yesterdayAngles.map(section => (
+							        <Shape
+							          key={ section.index }
+							          d={ yesterdayPath(section) }
+							          fill={ '#FFF' }
+							          strokeWidth={ 0 }
+							          fill={ colorsYesterday[section.index] }
+							        />
+							      ))
+							    }  
+					        </Group>
+
+					      </Surface>
+
 					</View>
 
 					<View style={{ padding: 0, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-						<View style={[ stats.clmn ]}>
-							<Text style={ font.statSub }>encounter score</Text>
-							<Text style={ font.statTitle }>34</Text>
+						<View style={[ stats.clmn, { paddingTop: 30} ]}>
+							<Text style={ font.statSub }>total kms today</Text>
+							<Text style={[ font.statTitle ]}>34.265</Text>
+							<Text style={ font.statSub }>89.458 kms yesterday</Text>
 						</View>
-						<TouchableOpacity style={{ marginTop: 15, padding: 30 }} onPress={() => { this.props.navigation.navigate('Stats') }}>
-							<Image style={ buttons.icon } source={{uri: 'https://corono.s3-eu-west-1.amazonaws.com/icons/Stats.png'}} />
-						</TouchableOpacity>
 					</View>
 
 				</Animated.View>
 
 				<View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 40 }}>
+
+					<TouchableOpacity activeOpacity={ 1 } onPress={() => { this.props.navigation.navigate('Stats') }} style={[ buttons.stats ]}>
+						<Image style={ buttons.icon, buttons.smaller } source={{uri: 'https://corono.s3-eu-west-1.amazonaws.com/icons/Stats.png'}} />
+					</TouchableOpacity>
 					
 					<View>
 						<TouchableOpacity onPress={() => { this._clearUI() }}>

@@ -73,7 +73,7 @@ const font = StyleSheet.create({
 	},
 
 	statTitle: {
-		fontSize: 100,
+		fontSize: 45,
 		fontWeight: 'bold',
 		color: '#FFF'
 	},
@@ -116,6 +116,11 @@ const buttons = StyleSheet.create({
 		height: 20,
 		opacity: 1,
 	},
+	smaller: {
+		width: 14, 
+		height: 14,
+		opacity: 1,
+	},
 	active: {
 		opacity: 1
 	},
@@ -123,6 +128,17 @@ const buttons = StyleSheet.create({
 		position: 'relative',
 		top: -1,
 		width: 25,
+	},
+
+	stats: {
+		position: 'absolute', 
+		top: -40, 
+		width: 50, 
+		height: 50, 
+		borderRadius: 25, 
+		backgroundColor: '#FFF', 
+		alignItems: 'center', 
+		justifyContent: 'center'
 	},
 
 	toggleHolder: {
