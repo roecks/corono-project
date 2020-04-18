@@ -1,6 +1,7 @@
 /**
 
 	Screen: Dashboard
+	Data: { total kms today, total kms yesterday, avg kmns last 7 days }
 
 **/
 
@@ -22,58 +23,30 @@ import {
 
 import { Navigation } from 'react-navigation';
 import Modal from 'react-native-modal';
-
 import Svg, { G, Rect, RadialGradient, LinearGradient, Stop, Path, Circle, Text as SVGText } from 'react-native-svg';
 import AsyncStorage from '@react-native-community/async-storage';
 
 // import geo data
 import Geolocation from '@react-native-community/geolocation';
-import MapView, { Heatmap, PROVIDER_GOOGLE } from 'react-native-maps';
 
-import { Surface, Group, Shape, ART } from '@react-native-community/art';
-import * as d3 from 'd3';
-
-const today = [
-  { name: 'actual', kms: 34 },
-  { name: 'over', kms: 66 },
-]
-
-const yesterday = [
-  { name: 'actual', kms: 89 },
-  { name: 'over', kms: 11 },
-]
-
-const todaySizes = [200, 140];
-const yesterdaySizes = [200, 120];
-
-const todayAngles = d3.pie().value(d => d.kms)(today);
-const yesterdayAngles = d3.pie().value(d => d.kms)(yesterday);
-
-const todayPath = d3.arc()
-  .outerRadius(todaySizes[1])
-  .innerRadius(todaySizes[1] - 8)
-  .padAngle(.03);
-
-const yesterdayPath = d3.arc()
-  .outerRadius(yesterdaySizes[1])
-  .innerRadius(yesterdaySizes[1] - 4)
-  .padAngle(.03);
-
-const colorsToday = ['rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)'];
-const colorsYesterday = ['rgba(0, 0, 0, .2)', 'rgba(0, 0, 0, 0)'];
-
-import Notifications from './Notifications';
+// import notifications component
+import Notifications from '../modals/Notifications';
 
 // import styles
 import { viewport, font, buttons, nav, stats } from '../stylesheets/master';
 
-// set dimensions
+// import data visualization
+import { Surface, Group, Shape, ART } from '@react-native-community/art';
+import * as d3 from 'd3';
+
+// get screen dimensions
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 class Dashboard extends React.Component {
 
 	state = {
+		publickey: '',
 		toggle: false,
 		togglePos: new Animated.Value(0),
 		toggleColor: new Animated.Value(0),
@@ -81,59 +54,73 @@ class Dashboard extends React.Component {
 		isModalVisible: false,
 		scale: new Animated.Value(1),
 		headerRadius: new Animated.Value(0),
-		publickey: '',
+
 		locations: [],
-		writing: false,
-		watchID: null,
+		watching: false,
 
 		prevLatLng: null,
 		distanceTraveled: 0,
-	}
 
-	watchID = null;
+		data: [45, 65, 120],
+
+	}
 
 	componentDidMount() {
 
+		// get public user key and start geo tracking
 		this._setPublickey();
 		this._startGeo();
 
+		// debugging
 		setInterval(() => {
 			// this._showLocs();
+			// this._updateGraph();
 		}, 2000);
 
 	}
 
+	// start geo tracking, locally
 	_startGeo = async () => {
 
-		let watchID = await Geolocation.watchPosition(
-			(info) => {
+		const watching = await AsyncStorage.getItem('watchID');
 
-				const lat = info.coords.latitude;
-				const long = info.coords.longitude;
-				const loc = { latitude: lat, longitude: long };
-				this._saveLocs(loc);
+		if(watching === null) {
+			
+			let watchID = await Geolocation.watchPosition(
+				(info) => {
 
-				// const joined = this.state.locations.concat(loc);
-				// this.setState({ locations: joined });
-				// console.log(this.state.locations);
+					const lat = info.coords.latitude;
+					const long = info.coords.longitude;
+					const loc = { latitude: lat, longitude: long };
+					this._saveLocs(loc);
 
-			},
-			(error) => console.log(error),
-			{
-				enableHighAccuracy: true,
-				distanceFilter: 0
+					// const joined = this.state.locations.concat(loc);
+					// this.setState({ locations: joined });
+					// console.log(this.state.locations);
+
+				},
+				(error) => console.log(error),
+				{
+					enableHighAccuracy: true,
+					distanceFilter: 20
+				}
+			);
+
+			try {
+				await AsyncStorage.setItem('watchID', 'true');
+				console.log(watchID);
+			} catch(e) {
+				console.log(e);
 			}
-		);
 
-		await this.setState({ watchID: watchID });
-		console.log('watchID: '+ this.state.watchID);
-
+		}
 
 	}
 
 	// set a writing var to manage payload on savelocs function
 	writing = false;
 
+	// save lat/lng coords in local storage
 	_saveLocs = async (loc) => {
 
 		if(!this.writing) {
@@ -143,6 +130,7 @@ class Dashboard extends React.Component {
 
 			if(locations === null) {
 
+				// init locations array
 				try {
 					const newLocs = [];
 					await this.setState({ prevLatLng: loc });
@@ -151,6 +139,7 @@ class Dashboard extends React.Component {
 				
 			} else {
 
+				// build locations array
 				locations = JSON.parse(locations);
 				locations.push(loc);
 
@@ -174,13 +163,7 @@ class Dashboard extends React.Component {
 
 	}
 
-	_showLocs = async () => {
-
-		let locations = await AsyncStorage.getItem('locations');
-		console.log(locations);
-
-	}
-
+	// calculate the distance between coords
 	_calcDistance = (lat1, lat2, lon1, lon2, unit) => {
 		if ((lat1 == lat2) && (lon1 == lon2)) {
 			return 0;
@@ -203,6 +186,7 @@ class Dashboard extends React.Component {
 		}
 	}
 
+	// check if publis key is in local storage
 	_setPublickey = async () => {
 		try {
 
@@ -213,6 +197,7 @@ class Dashboard extends React.Component {
 		} catch (e) { console.log(e); }
 	}
 
+	// toggle for real-time location sharing
 	_toggle = () => {
 
 		this.setState(prevState => ({
@@ -243,13 +228,7 @@ class Dashboard extends React.Component {
 
 	}
 
-	_clearUI = async () => {
-		// Geolocation.clearWatch(this.state.watchID);
-		Geolocation.stopObserving();
-		await AsyncStorage.clear();
-		this.props.navigation.navigate('Splash');
-	}
-
+	// show notifications
 	_showModal() {
 
 		let toScale = (this.state.isModalVisible) ? 1 : .95;
@@ -274,6 +253,20 @@ class Dashboard extends React.Component {
 
 	}
 
+	// debugging: clear local storage and back to splash
+	_clearUI = async () => {
+		// Geolocation.clearWatch(this.state.watchID);
+		Geolocation.stopObserving();
+		await AsyncStorage.clear();
+		this.props.navigation.navigate('Splash');
+	}
+
+	// debugging: show locations
+	_showLocs = async () => {
+		let locations = await AsyncStorage.getItem('locations');
+		console.log(locations);
+	}
+
 	render() {
 
 		const interpolateColor = this.state.toggleColor.interpolate({
@@ -286,6 +279,66 @@ class Dashboard extends React.Component {
 			outputRange: [0, 30]
 		})
 
+		/* START DATA VISUALIZATION */
+
+		const data = {
+			today: this.state.data[0],
+			yesterday: this.state.data[1],
+			avg: this.state.data[2]
+		}
+
+		let today = [
+		  { name: 'actual', kms: data.today },
+		  { name: 'over', kms: data.avg - data.today },
+		]
+
+		const yesterday = [
+		  { name: 'actual', kms: data.yesterday },
+		  { name: 'over', kms: data.avg - data.yesterday },
+		]
+
+		// set arc radius (big and small)
+		const todaySizes = [200, 140];
+		const yesterdaySizes = [200, 120];
+
+		// calculate angles in PIE chart, unsorted
+		let todayAngles = d3.pie().sort(null).value(d => d.kms)(today);
+		const yesterdayAngles = d3.pie().sort(null).value(d => d.kms)(yesterday);
+
+		// calculate paths
+		const todayPath = d3.arc()
+		  .outerRadius(todaySizes[1])
+		  .innerRadius(todaySizes[1] - 8)
+		  .padAngle(0);
+		const yesterdayPath = d3.arc()
+		  .outerRadius(yesterdaySizes[1])
+		  .innerRadius(yesterdaySizes[1] - 4)
+		  .padAngle(.03);
+
+		// set colors for both arcs
+		const colorsToday = ['rgba(255, 255, 255, 1)', 'rgba(0, 0, 0, 0)'];
+		const colorsYesterday = ['rgba(0, 0, 0, .2)', 'rgba(0, 0, 0, 0)'];
+
+		const todayArc = todayAngles.map(section => (
+			<Shape
+				key={ section.index }
+				d={ todayPath(section) }
+				fill={ '#FFF' }
+				strokeWidth={ 0 }
+				fill={ colorsToday[section.index] }
+			/>
+		));
+
+		const yesterdayArc = yesterdayAngles.map(section => (
+			<Shape
+				key={ section.index }
+				d={ yesterdayPath(section) }
+				fill={ '#FFF' }
+				strokeWidth={ 0 }
+				fill={ colorsYesterday[section.index] }
+			/>
+		));
+
 		return (
 
 			<View style={[ viewport.container ]}>
@@ -293,6 +346,7 @@ class Dashboard extends React.Component {
 				<TouchableOpacity style={[ nav.notificationIcon ]} onPress={() => { this._showModal() }}>
 					<Text style={[ font.regular, font.white, { fontWeight: 'bold' }]}>3</Text>
 				</TouchableOpacity>
+
 				<Modal 
 					isVisible={ this.state.isModalVisible }
 					hasBackdrop={ false }
@@ -304,6 +358,8 @@ class Dashboard extends React.Component {
 						<Notifications />
 					</View>
 				</Modal>
+
+			{/* HEADER ELEMENT */}
 
 				<Animated.View style={[ (this.state.isModalVisible) ? viewport.scale : null, viewport.header, { transform: [{ scale: this.state.scale }], borderRadius: interpolateRadius }]}>
 					
@@ -325,31 +381,11 @@ class Dashboard extends React.Component {
 						<Surface width={ SCREEN_WIDTH } height={ SCREEN_WIDTH } style={{ position: 'absolute', top: '3%', left: 0, transform: [{ rotate: '180deg' }] }}>
 					        
 					        <Group x={ todaySizes[1] + (SCREEN_WIDTH - todaySizes[1] * 2) / 2 } y={ todaySizes[1] }>
-					          {
-							      todayAngles.map(section => (
-							        <Shape
-							          key={ section.index }
-							          d={ todayPath(section) }
-							          fill={ '#FFF' }
-							          strokeWidth={ 0 }
-							          fill={ colorsToday[section.index] }
-							        />
-							      ))
-							    }  
+					          { todayArc }
 					        </Group>
 
 					        <Group x={ yesterdaySizes[1] + (SCREEN_WIDTH - yesterdaySizes[1] * 2) / 2 } y={ yesterdaySizes[1] + 20 }>
-					          {
-							      yesterdayAngles.map(section => (
-							        <Shape
-							          key={ section.index }
-							          d={ yesterdayPath(section) }
-							          fill={ '#FFF' }
-							          strokeWidth={ 0 }
-							          fill={ colorsYesterday[section.index] }
-							        />
-							      ))
-							    }  
+					          { yesterdayArc }  
 					        </Group>
 
 					      </Surface>
@@ -358,13 +394,15 @@ class Dashboard extends React.Component {
 
 					<View style={{ padding: 0, flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 						<View style={[ stats.clmn, { paddingTop: 30} ]}>
-							<Text style={ font.statSub }>total kms today</Text>
+							<Text style={ font.statSub }>totale kms vandaag</Text>
 							<Text style={[ font.statTitle ]}>{ this.state.distanceTraveled.toFixed(2) }</Text>
-							<Text style={ font.statSub }>89.458 kms yesterday</Text>
+							<Text style={[ font.statSub, { color: 'rgba(0, 0, 0, .4)' }]}>{ data.yesterday * 1000 } kms gisteren</Text>
 						</View>
 					</View>
 
 				</Animated.View>
+
+			{/* BODY SYNC AND TOGGLE */}
 
 				<View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 40 }}>
 
@@ -390,6 +428,8 @@ class Dashboard extends React.Component {
 					</View>
 
 				</View>
+
+			{/* NAVIGATION */}
 
 				<View style={[ nav.bar, nav.barRight ]}>
 					<View style={[ nav.inner ]}>

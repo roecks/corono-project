@@ -1,6 +1,6 @@
 /**
 
-	Screen: Notifications
+	Modal: Notifications
 
 **/
 
@@ -41,6 +41,10 @@ class Notifications extends React.Component {
 
 	componentDidMount() {
 		this._setPublickey();
+	}
+
+	_getNotifications = async  () => {
+		
 	}
 
 	_setPublickey = async () => {

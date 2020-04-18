@@ -97,7 +97,7 @@ class Stats extends React.Component {
 
 				</View>
 
-				<View style={{ flex: 2, justifyContent: 'flex-start', alignItems: 'center', padding: 40 }}>
+				<View style={{ flex: 2, justifyContent: 'flex-start', alignItems: 'center', padding: 40, paddingTop: 80 }}>
 
           {/*
 					<View>
@@ -127,11 +127,13 @@ class Stats extends React.Component {
           <Text style={[ styles.heading ]}>jouw risicoscore in contact met de omgeving</Text>
 					<Text style={[ font.caption, { width: '80%', textAlign: 'center', marginTop: 30 } ]}>Jouw risicoscore wordt berekend op basis van jouw anonieme bewegingen van de afgelopen 6 dagen in contact met de omgeving.</Text>
 
+          {/*
 					<TouchableOpacity onPress={() => { this._openMaps() }}>
 						<View style={{ width: 40, height: 40, marginTop: 30 }}>
 							<Image style={{ width: 40, height: 40 }} source={{ uri: 'https://corono.s3-eu-west-1.amazonaws.com/icons/Maps.png'}} />
 						</View>
 					</TouchableOpacity>
+          */}
 
 				</View>
 

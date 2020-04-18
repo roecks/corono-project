@@ -6,7 +6,6 @@ import Splash from './src/screens/Splash';
 import Dashboard from './src/screens/Dashboard';
 import Settings from './src/screens/Settings';
 import Stats from './src/screens/Stats';
-import Notifications from './src/screens/Notifications';
 
 const Project = createStackNavigator(
 	{
@@ -14,7 +13,6 @@ const Project = createStackNavigator(
 		Dashboard: { screen: Dashboard },
 		Settings: { screen: Settings },
 		Stats: { screen: Stats },
-		Notifications: { screen: Notifications },
 	},
 	{
 		initialRouteName: 'Splash',

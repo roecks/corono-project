@@ -56,7 +56,7 @@ class Settings extends React.Component {
 			headache: 0,
 			cold: 0,
 			stuffy: 0,
-			nauseous: 10,
+			nauseous: 0,
 			fever: 0,
 			diarrhea: 0
 		}

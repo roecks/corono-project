@@ -1,6 +1,9 @@
 /**
 
 	Component: Graph
+	Data: 
+		- Risk scores array : [1, 2, 3, 4, 5, 6] (6 days ago til today)
+		- Risk score objects in array for each of the last 6 days { date: ...new Date(y, m, d), y: ...risk score}
 
 **/
 
@@ -42,17 +45,8 @@ import {
 	scaleQuantile
 } from 'd3-scale';
 
-// set dimensions
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-const height = 200;
-const { width } = Dimensions.get('window');
-const verticalPadding = 6;
-const cursorRadius = 10;
-const labelWidth = 70;
-
-const valueOne = new Animated.Value(20);
+// risk score data
 const values = [20, 35, 65, 10, 45, 30];
 const data = [
 	{ x: new Date(2020, 9, 1), y: values[0] },
@@ -62,6 +56,16 @@ const data = [
 	{ x: new Date(2020, 9, 5), y: values[4] },
 	{ x: new Date(2020, 9, 6), y: values[5] }
 ];
+
+// set dimensions
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+const height = 200;
+const { width } = Dimensions.get('window');
+const verticalPadding = 6;
+const cursorRadius = 10;
+const labelWidth = 60;
 
 const scaleX = scaleTime().domain([new Date(2020, 9, 1), new Date(2020, 9, 6)]).range([0, SCREEN_WIDTH]);
 const scaleY = scaleLinear().domain([0, 100]).range([height - verticalPadding, verticalPadding]);
@@ -124,11 +128,31 @@ class Graph extends React.Component {
 			extrapolate: "clamp"
 		});
 
+		// scale hairlines
+		const hairlines = [1, 1, .8, .6, .6, .4, .2, .2];
+		// const hairlines = [1, 1];
+
 		return (
 
 			<SafeAreaView style={ styles.root }>
 
 				<View style={ styles.container }>
+
+					<View style={ styles.scale }>
+	                	<Text style={ styles.scaleText }>100</Text>
+	                	<View style={ styles.hairline } />
+	                	<View style={ styles.hairline } />
+	                	
+
+	                	{ 
+	                		hairlines.map((alpha, key) => {
+
+	                			return(<View key={ key } style={[ styles.hairline, { opacity: alpha } ]} />)
+
+	                		})
+	                	}
+
+	              	</View>
 
 					<Svg {... { width, height }}>
 
@@ -200,11 +224,11 @@ const styles = StyleSheet.create({
 		width: labelWidth,
 		borderRadius: 5,
 		position: 'absolute',
-		top: -45, 
+		bottom: -40, 
 		left: 0,
 	},
 	textinput: {
-		fontSize: 24,
+		fontSize: 16,
 		fontWeight: 'bold',
 		color: 'white'
 	},
@@ -214,6 +238,23 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.2,
 		shadowRadius: 30,
 	},
+	scale: { 
+		position: 'absolute', top: 0, left: 20, alignItems: 'center'
+	},
+	scaleText: {
+		fontSize: 12,
+		fontWeight: 'bold',
+		color: 'white'
+	},
+	hairlines: {
+		marginTop: 10
+	},
+	hairline: {
+		marginTop: 5,
+		width: 10,
+		height: 1,
+		backgroundColor: 'white'
+	}
 });
 
 export default Graph;
