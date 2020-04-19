@@ -50,3 +50,13 @@ React Native: [Official website](https://reactnative.dev/)
 Stellar Developer Docs: [Documentation](https://www.stellar.org/developers/guides/)  
 Emojis: [Emoji Stack](https://emojipedia.org/)  
 
+## Dependencies
+[react-native-geolocation](https://github.com/react-native-community/react-native-geolocation). 
+[react-native-modal](https://github.com/react-native-community/react-native-modal)  
+[react-native-svg](https://github.com/react-native-community/react-native-svg)  
+[@react-native-community/async-storage](https://github.com/react-native-community/async-storage)  
+[@react-native-community/art](https://github.com/react-native-community/art)  
+[d3](https://github.com/react-native-community/art)  
+
+
+
