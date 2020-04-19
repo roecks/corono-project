@@ -51,6 +51,7 @@ Stellar Developer Docs: [Documentation](https://www.stellar.org/developers/guide
 Emojis: [Emoji Stack](https://emojipedia.org/)  
 
 ## Module Dependencies
+We have paid extra attention to keeping the number of depencies low to mitigate the risk of vulnerabilities and to enable faster code auditing:
 [react-native-geolocation](https://github.com/react-native-community/react-native-geolocation). 
 [react-native-modal](https://github.com/react-native-community/react-native-modal)  
 [react-native-svg](https://github.com/react-native-community/react-native-svg)  
