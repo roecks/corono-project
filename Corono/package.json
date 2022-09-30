@@ -15,7 +15,7 @@
     "@react-native-community/async-storage": "^1.9.0",
     "@react-native-community/geolocation": "^2.0.2",
     "@react-native-community/masked-view": "^0.1.7",
-    "d3": "^5.15.1",
+    "d3": "^7.6.1",
     "react": "16.11.0",
     "react-native": "0.62.1",
     "react-native-gesture-handler": "^1.6.1",
